@@ -1,0 +1,9 @@
+[Unit]
+Description=Deploy the CTP internal landing page (git pull + publish)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ctp-landing-deploy
+# Logs: journalctl -u ctp-landing-deploy -n 50

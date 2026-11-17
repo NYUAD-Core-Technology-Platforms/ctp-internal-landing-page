@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#3D0462">
+  <meta name="robots" content="noindex, nofollow">
+  <title>CTP internal hub · NYU Abu Dhabi</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!--
+    This file is the page shell only. All text and links come from
+    links.yaml (this repo) and ctp-common/data/*.yaml (shared data).
+    To change content, edit links.yaml, not this file.
+  -->
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="./" aria-label="CTP internal hub, home">
+        <img src="assets/img/nyuad-logo.png" alt="NYU Abu Dhabi" width="139" height="35">
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-label">Core Technology Platforms<span class="brand-sub">Internal</span></span>
+      </a>
+      <label class="search" for="filter">
+        <svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#i-search"></use></svg>
+        <input id="filter" type="search" placeholder="Filter links" autocomplete="off" spellcheck="false">
+        <kbd aria-hidden="true">/</kbd>
+      </label>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">NYU Abu Dhabi · Core Technology Platforms</p>
+      <h1 id="page-title">CTP internal hub</h1>
+      <p class="lede" id="page-intro"></p>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <div id="notice" class="notice" hidden></div>
+
+    <section aria-labelledby="h-start" class="block">
+      <h2 class="label" id="h-start">Start here</h2>
+      <div id="highlights" class="tiles"></div>
+    </section>
+
+    <div class="columns">
+      <div class="col-main" id="sections"></div>
+
+      <aside class="col-side">
+        <section class="block" aria-labelledby="h-contacts">
+          <h2 class="label" id="h-contacts">Who to contact</h2>
+          <div id="contacts" class="side-card"><p class="muted">Loading…</p></div>
+        </section>
+
+        <section class="block" aria-labelledby="h-clusters">
+          <h2 class="label" id="h-clusters">Clusters</h2>
+          <div id="clusters" class="side-card"><p class="muted">Loading…</p></div>
+        </section>
+
+        <section class="block" aria-labelledby="h-first">
+          <h2 class="label" id="h-first">New to CTP?</h2>
+          <ol id="first-steps" class="steps side-card"></ol>
+        </section>
+      </aside>
+    </div>
+
+    <p id="no-results" class="no-results" hidden>No links match your filter.</p>
+
+    <section class="block" aria-labelledby="h-where" id="where-block">
+      <h2 class="label" id="h-where">Where does it live?</h2>
+      <p class="block-intro">Every fact has one home. To correct something you see on this page or elsewhere, edit it at its source; every page that uses it updates.</p>
+      <div class="table-wrap">
+        <table class="where">
+          <thead><tr><th scope="col">To change</th><th scope="col">Edit</th></tr></thead>
+          <tbody id="where"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <p id="build-info" class="muted">Local preview</p>
+      <p><a id="edit-link" href="#">Edit this page</a> · <a id="common-link" href="#">Shared data: ctp-common</a></p>
+    </div>
+  </footer>
+
+  <noscript><p class="wrap notice">This page needs JavaScript to load its links.</p></noscript>
+  <script src="assets/js/vendor/js-yaml.min.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

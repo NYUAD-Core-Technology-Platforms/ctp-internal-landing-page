@@ -1,0 +1,24 @@
+# /etc/ctp-landing.conf: server settings for the CTP internal landing page.
+# install.sh copies this file to /etc/ctp-landing.conf on first run.
+# Edit the copy in /etc, not this example. Every value has a sensible default.
+
+# Where this repository is cloned on the server.
+REPO_DIR=/opt/ctp-internal-landing-page
+BRANCH=main
+
+# Where the shared-data repository is cloned (read-only copy, managed by deploy.sh).
+COMMON_DIR=/opt/ctp-common
+COMMON_URL=https://github.com/NYUAD-Core-Technology-Platforms/ctp-common.git
+# Branch or tag of ctp-common to follow. Pin to a tag (e.g. v1.2.0) if you want
+# shared-data changes to reach this page only after a release.
+COMMON_REF=main
+
+# Folder the web server serves. /var/www/html is Apache's default on RHEL, so
+# no web-server configuration is needed if this site is the only one.
+# For nginx's default use /usr/share/nginx/html.
+# Safety: deploy.sh refuses to write into a non-empty folder it did not create.
+WEB_ROOT=/var/www/html
+
+# If the server reaches GitHub through a proxy, uncomment and set these.
+# HTTPS_PROXY=http://proxy.example.nyu.edu:8080
+# HTTP_PROXY=http://proxy.example.nyu.edu:8080

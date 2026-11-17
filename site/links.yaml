@@ -1,0 +1,178 @@
+# =====================================================================
+#  CTP internal landing page: content
+#  THIS IS THE FILE YOU NORMALLY EDIT. Save, commit, push to main.
+#  The server picks it up automatically (see README.md, "Deploying").
+#
+#  Rule: only put information here that is NOT already kept in another
+#  CTP repository. Shared facts (people, org chart, public URLs,
+#  mailboxes, platform descriptions) live in ctp-common and are
+#  referenced by key, never copied into this file.
+#
+#  Every link uses exactly ONE of these fields to say where it points:
+#    url:    a literal URL, for internal tools recorded nowhere else
+#    common: a key in ctp-common/data/links.yaml   e.g. public.booking_system
+#    docs:   a page of the ctp-common docs site    e.g. orgchart/
+#    repo:   a path in the GitHub organisation     e.g. ctp-common/blob/main/data/people.yaml
+#    pages:  a GitHub Pages site of the org        e.g. ctp-upscaling-workshop-series/
+#    ref:    the id of another link in this file   e.g. forum
+#  Leave url: "" when you do not have the link yet; the page shows it
+#  as "Link not set" with a pointer to this file.
+#
+#  Optional fields: id, description, note (short grey tag), icon.
+#  Icons are Lucide names available in assets/img/icons.svg.
+# =====================================================================
+
+sources:
+  github_org: https://github.com/NYUAD-Core-Technology-Platforms
+  pages_base: https://nyuad-core-technology-platforms.github.io/
+  docs_site: https://nyuad-core-technology-platforms.github.io/ctp-common/
+  # Used only when the server copy of ctp-common is missing (e.g. local preview).
+  ctp_common_raw: https://raw.githubusercontent.com/NYUAD-Core-Technology-Platforms/ctp-common/main/data/
+  # Used by the "Edit this page" link.
+  this_repo: ctp-internal-landing-page
+
+page:
+  title: CTP internal hub
+  intro: >-
+    Everyday links and practical information for Core Technology Platforms
+    staff. People, contacts and the org chart come live from ctp-common;
+    this page adds only what is not kept anywhere else.
+
+# Large tiles at the top of the page.
+highlights:
+  - id: forum
+    title: Discourse forum
+    description: Questions, announcements and discussion across all platforms.
+    icon: messages-square
+    url: ""            # TODO: add the forum URL
+  - id: dashboard
+    title: CTP dashboard
+    description: Operational overview of the platforms.
+    icon: layout-dashboard
+    url: ""            # TODO: add the dashboard URL
+  - id: strategy
+    title: CTP strategy and objectives
+    description: Strategic objectives and cluster goals.
+    icon: target
+    url: ""            # TODO: add the strategy site URL
+  - title: Organizational chart
+    description: Director, administration, clusters and their leads.
+    icon: network
+    docs: orgchart/
+  - title: Team directory
+    description: Everyone in CTP with role, email, extension and office.
+    icon: users
+    docs: team/
+  - title: Book equipment (CTPSS)
+    description: Reservation system for every CTP instrument.
+    note: NYU network or VPN
+    icon: calendar-check
+    common: public.booking_system
+
+sections:
+  - title: Platforms and operations
+    links:
+      - title: Platforms overview
+        description: What each core lab does, its key techniques and equipment.
+        icon: flask-conical
+        docs: platforms/
+      - title: Booking, training and data guide
+        description: CTPSS accounts, booking steps, screen lock, saving and mapping data.
+        icon: book-open
+        repo: ctp-common/blob/main/operations/scheduling.md
+      - title: Procurement guide
+        description: Requisitions, competitive bid exceptions and the purchase lifecycle.
+        icon: shopping-cart
+        repo: ctp-common/blob/main/operations/procurement.md
+      - title: CTP Requisition Form
+        icon: file-text
+        note: NYU login
+        common: public.requisition_form
+      - title: Competitive Bid Exception form
+        icon: file-signature
+        common: public.competitive_bid_exception
+      - title: Linktree
+        description: Forms, news and quick links maintained by CTP.
+        icon: link
+        common: public.linktree
+      - title: Public CTP website
+        description: The NYUAD page researchers outside CTP see.
+        icon: compass
+        common: public.ctp_website
+
+  - title: Templates, training and websites
+    links:
+      - title: CTP templates
+        description: Slidev, PowerPoint, Word and LaTeX templates in the CTP brand.
+        icon: palette
+        repo: ctp-templates
+      - title: Brand design system
+        description: Colors, type, logo use and writing style for anything CTP publishes.
+        icon: palette
+        repo: ctp-templates/blob/main/shared/brand/DESIGN_SYSTEM.md
+      - title: CTP Upscaling Workshop Series
+        description: Slides, PDFs and PowerPoints from past CTP workshops.
+        icon: presentation
+        pages: ctp-upscaling-workshop-series/
+      - title: NYUAD AI workshops
+        description: AI upscaling workshop decks for the wider NYUAD community.
+        icon: graduation-cap
+        pages: nyuad-ai-workshops/
+      - title: Multi-omics core website
+        description: Public site of the multi-omics core facility.
+        icon: flask-conical
+        pages: imo-core-website-external/
+      - title: All CTP repositories
+        description: Everything the team maintains on GitHub.
+        icon: folder-git-2
+        url: https://github.com/orgs/NYUAD-Core-Technology-Platforms/repositories
+
+# Sidebar "Who to contact". The Director and CTP Administration are read
+# from ctp-common (clusters.yaml + people.yaml). Mailbox addresses come from
+# ctp-common/data/links.yaml; only the labels below are kept here.
+mailboxes:
+  - common: contact.user_group_email
+    label: Training and equipment access requests
+  - common: contact.generic_email
+    label: CTP administration
+  - common: contact.all_members_email
+    label: Reaches every CTP staff member
+
+# Sidebar checklist for people joining CTP.
+first_steps:
+  - text: Find yourself and your cluster on the org chart. If anything is wrong, it is fixed in ctp-common, not here.
+    docs: orgchart/
+  - text: Join the Discourse forum and follow the announcements category.
+    ref: forum
+  - text: Read how training, booking and data saving work before your first session.
+    repo: ctp-common/blob/main/operations/scheduling.md
+  - text: Use the CTP templates for slides and documents.
+    repo: ctp-templates
+  - text: Bookmark this page.
+
+# "Where does it live?" table: the answer to "where do I change X?".
+where_to_edit:
+  - change: A person joined, left, or changed role, email, phone or office
+    file: data/people.yaml in ctp-common
+    repo: ctp-common/blob/main/data/people.yaml
+  - change: Cluster membership or a cluster lead
+    file: data/clusters.yaml in ctp-common
+    repo: ctp-common/blob/main/data/clusters.yaml
+  - change: A public URL, a generic mailbox or the postal address
+    file: data/links.yaml in ctp-common
+    repo: ctp-common/blob/main/data/links.yaml
+  - change: A platform description or its equipment list
+    file: platforms/<id>.md in ctp-common
+    repo: ctp-common/tree/main/platforms
+  - change: The booking or procurement procedure
+    file: operations/ in ctp-common
+    repo: ctp-common/tree/main/operations
+  - change: Brand colors, fonts, logo, or a slide or document template
+    file: ctp-templates (shared/brand/ for the brand)
+    repo: ctp-templates
+  - change: A workshop deck
+    file: workshops/ in ctp-upscaling-workshop-series
+    repo: ctp-upscaling-workshop-series
+  - change: An internal link on this page (forum, dashboard, strategy, anything above)
+    file: site/links.yaml in this repository
+    repo: ctp-internal-landing-page/blob/main/site/links.yaml
