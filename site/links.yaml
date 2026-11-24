@@ -44,17 +44,17 @@ highlights:
     title: Discourse forum
     description: Questions, announcements and discussion across all platforms.
     icon: messages-square
-    url: ""            # TODO: add the forum URL
+    url: https://ctp-nyuad.discourse.group/
   - id: dashboard
     title: CTP dashboard
     description: Operational overview of the platforms.
     icon: layout-dashboard
-    url: ""            # TODO: add the dashboard URL
+    url: https://ctp-dashboard.web.app/
   - id: strategy
     title: CTP strategy and objectives
     description: Strategic objectives and cluster goals.
     icon: target
-    url: ""            # TODO: add the strategy site URL
+    url: https://ctp-strategy.pages.dev/
   - title: Organizational chart
     description: Director, administration, clusters and their leads.
     icon: network
