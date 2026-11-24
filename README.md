@@ -73,7 +73,7 @@ Open <http://localhost:8000>. The preview reads shared data straight from GitHub
 
 ## Deploying
 
-The server is a RHEL machine running a web server (Apache by default). The page is published by one script, [`deploy/deploy.sh`](deploy/deploy.sh), installed as the command `ctp-landing-deploy`. Each run:
+The server is a Linux machine (Ubuntu with `apt`, or RHEL with `dnf`; both are handled) running a web server, Apache by default. The page is published by one script, [`deploy/deploy.sh`](deploy/deploy.sh), installed as the command `ctp-landing-deploy`. Each run:
 
 1. pulls the latest `main` of this repo into `/opt/ctp-internal-landing-page`,
 2. pulls `ctp-common` into `/opt/ctp-common`,
@@ -87,14 +87,14 @@ It is safe to run any time, as often as you like.
 SSH in, then:
 
 ```bash
-sudo dnf install -y git
+sudo apt install -y git        # RHEL: sudo dnf install -y git
 sudo git clone https://github.com/NYUAD-Core-Technology-Platforms/ctp-internal-landing-page.git /opt/ctp-internal-landing-page
 sudo bash /opt/ctp-internal-landing-page/deploy/install.sh
 ```
 
-`install.sh` installs `rsync` and `python3-pyyaml` if needed, creates `/etc/ctp-landing.conf`, adds the `ctp-landing-deploy` command, turns on a systemd timer that redeploys every 10 minutes, and runs the first deploy. It does not touch the web-server configuration. Then open `http://<server>/`.
+`install.sh` installs `rsync`, PyYAML and (if no web server is running) Apache, creates `/etc/ctp-landing.conf`, adds the `ctp-landing-deploy` command, turns on a systemd timer that redeploys every 10 minutes, and runs the first deploy. It does not touch the web-server configuration. Then open `http://<server>/`.
 
-If this server already serves something else from `/var/www/html`, the deploy stops with a clear message instead of overwriting it: see [Web server](#web-server).
+If `/var/www/html` only holds the web server's default welcome page, it is moved to `/var/www/html.default-page-backup`. If it holds anything else, the deploy stops with a clear message instead of overwriting it: see [Web server](#web-server).
 
 ### When something changes: what to do
 
@@ -105,7 +105,7 @@ If this server already serves something else from `/var/www/html`, the deploy st
 | `deploy/deploy.sh` | Push. The next run uses the new version. |
 | `deploy/install.sh` or `deploy/systemd/*` | Push, then on the server: `sudo git -C /opt/ctp-internal-landing-page pull && sudo bash /opt/ctp-internal-landing-page/deploy/install.sh` |
 | Server settings (`/etc/ctp-landing.conf`) | Edit it on the server, then `sudo ctp-landing-deploy` |
-| Apache configuration | `sudo apachectl configtest && sudo systemctl reload httpd` |
+| Apache configuration | `sudo apachectl configtest && sudo systemctl reload apache2` (RHEL: `httpd`) |
 
 No auto-deploy wanted? Install with `sudo AUTO_DEPLOY=no bash /opt/ctp-internal-landing-page/deploy/install.sh` (or `sudo systemctl disable --now ctp-landing-deploy.timer`), and run `sudo ctp-landing-deploy` after each push.
 
@@ -125,17 +125,17 @@ The page footer also shows the deployed time and both commit hashes.
 | `git fetch failed` | The server cannot reach github.com. If NYU requires a proxy, set `HTTPS_PROXY` in `/etc/ctp-landing.conf`. If the repo is private, see below. |
 | `Validation failed; the live site was NOT changed` | A mistake in `site/links.yaml`; the lines above the error say where. Fix, push, rerun. |
 | `... already contains other files, so it was not touched` | `WEB_ROOT` points at a folder used by something else. See [Web server](#web-server). |
-| Apache test page instead of the hub | Apache serves a different folder than `WEB_ROOT`. Check `DocumentRoot` (`grep -ri documentroot /etc/httpd/conf /etc/httpd/conf.d`). |
-| `403 Forbidden` | SELinux labels. The script runs `restorecon` automatically; if you moved `WEB_ROOT` outside `/var/www`, run `sudo semanage fcontext -a -t httpd_sys_content_t "/your/path(/.*)?" && sudo restorecon -R /your/path`. |
+| Apache test page instead of the hub | Apache serves a different folder than `WEB_ROOT`. Check `DocumentRoot` (`grep -ri documentroot /etc/apache2/` on Ubuntu, `/etc/httpd/` on RHEL). |
+| `403 Forbidden` | Ubuntu: check the `<Directory>` grant for `WEB_ROOT`. RHEL: SELinux labels; the script runs `restorecon` automatically, and if you moved `WEB_ROOT` outside `/var/www`, run `sudo semanage fcontext -a -t httpd_sys_content_t "/your/path(/.*)?" && sudo restorecon -R /your/path`. |
 | Page loads but says shared data could not be loaded | `data/ctp-common/` is missing in the web folder. Run `sudo ctp-landing-deploy` and read its output. |
-| Browser cannot connect at all | Firewall: `sudo firewall-cmd --permanent --add-service=http --add-service=https && sudo firewall-cmd --reload` |
+| Browser cannot connect at all | Firewall. Ubuntu: `sudo ufw allow 'Apache Full'`. RHEL: `sudo firewall-cmd --permanent --add-service=http --add-service=https && sudo firewall-cmd --reload` |
 
 ### Web server
 
-- **Apache, this is the only site (default):** nothing to configure. RHEL's Apache serves `/var/www/html`, which is the default `WEB_ROOT`.
-- **Apache, the server hosts other sites:** set `WEB_ROOT=/var/www/ctp-landing` in `/etc/ctp-landing.conf`, copy [`deploy/apache-ctp-landing.conf`](deploy/apache-ctp-landing.conf) to `/etc/httpd/conf.d/`, set its `ServerName`, then `sudo apachectl configtest && sudo systemctl reload httpd` and `sudo ctp-landing-deploy`. That file also shows how to restrict access to campus/VPN addresses.
-- **nginx:** set `WEB_ROOT=/usr/share/nginx/html` (nginx's RHEL default), or point a `server { root ...; }` block at your chosen folder.
-- **HTTPS:** handled by the web server, not by this repo. If `mod_ssl` is set up, the same `DocumentRoot` applies to the `:443` virtual host.
+- **Apache, this is the only site (default):** nothing to configure. Apache serves `/var/www/html` on both Ubuntu and RHEL, which is the default `WEB_ROOT`.
+- **Apache, the server hosts other sites:** set `WEB_ROOT=/var/www/ctp-landing` in `/etc/ctp-landing.conf`, copy [`deploy/apache-ctp-landing.conf`](deploy/apache-ctp-landing.conf) to `/etc/apache2/sites-available/ctp-landing.conf` and run `sudo a2enmod headers && sudo a2ensite ctp-landing` (Ubuntu), or to `/etc/httpd/conf.d/ctp-landing.conf` (RHEL), set its `ServerName`, then `sudo apachectl configtest`, reload Apache, and `sudo ctp-landing-deploy`. That file also shows how to restrict access to campus/VPN addresses.
+- **nginx:** Ubuntu's default root is already `/var/www/html`; on RHEL set `WEB_ROOT=/usr/share/nginx/html`. Or point a `server { root ...; }` block at your chosen folder.
+- **HTTPS:** handled by the web server, not by this repo. If TLS is set up, the same `DocumentRoot` applies to the `:443` virtual host.
 
 ### Private repository
 

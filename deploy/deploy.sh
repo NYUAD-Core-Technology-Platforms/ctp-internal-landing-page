@@ -40,7 +40,7 @@ main() {
 
   local cmd
   for cmd in git rsync flock; do
-    command -v "$cmd" >/dev/null || die "'$cmd' is not installed. Run: sudo dnf install -y git rsync util-linux"
+    command -v "$cmd" >/dev/null || die "'$cmd' is not installed. Run deploy/install.sh, or install git, rsync and util-linux."
   done
 
   step "Updating this repository ($REPO_DIR, branch $BRANCH)"
@@ -69,7 +69,7 @@ main() {
     python3 "$REPO_DIR/scripts/check.py" --common-dir "$COMMON_DIR/data" \
       || die "Validation failed; the live site was NOT changed. Fix the errors above, push, and run this again."
   else
-    echo "  skipped (install python3-pyyaml to enable: sudo dnf install -y python3-pyyaml)"
+    echo "  skipped (install PyYAML to enable: sudo apt install python3-yaml, or sudo dnf install python3-pyyaml)"
   fi
 
   step "Building"
@@ -93,6 +93,14 @@ EOF
 
   step "Publishing to $WEB_ROOT"
   mkdir -p "$WEB_ROOT"
+  # A fresh Apache/nginx install leaves only its default welcome page here.
+  # Move it aside (not delete) so this site can take over the folder.
+  if [[ ! -e "$WEB_ROOT/$MARKER" ]] && only_default_page "$WEB_ROOT"; then
+    local BACKUP="${WEB_ROOT%/}.default-page-backup"
+    mkdir -p "$BACKUP"
+    mv "$WEB_ROOT"/* "$BACKUP"/
+    echo "  moved the web server's default welcome page to $BACKUP"
+  fi
   if [[ ! -e "$WEB_ROOT/$MARKER" ]] && [[ -n "$(ls -A "$WEB_ROOT" 2>/dev/null)" ]]; then
     die "$WEB_ROOT already contains other files, so it was not touched.
   Either set WEB_ROOT in /etc/ctp-landing.conf to an empty folder (and point
@@ -124,6 +132,21 @@ status() {
   if command -v systemctl >/dev/null && systemctl list-unit-files ctp-landing-deploy.timer >/dev/null 2>&1; then
     echo "Auto-deploy: $(systemctl is-active ctp-landing-deploy.timer 2>/dev/null || true)"
   fi
+}
+
+# True when the folder holds nothing but a stock Apache/nginx welcome page.
+only_default_page() {
+  local f n=0
+  for f in "$1"/* "$1"/.[!.]*; do
+    [[ -e "$f" ]] || continue
+    n=$((n + 1))
+    case "$(basename "$f")" in
+      index.nginx-debian.html) ;;
+      index.html) grep -qiE 'Apache2 (Ubuntu|Debian) Default Page|Test Page for the (Apache|HTTP) Server|Welcome to nginx' "$f" || return 1 ;;
+      *) return 1 ;;
+    esac
+  done
+  (( n > 0 ))
 }
 
 step() { echo; echo "==> $*"; }

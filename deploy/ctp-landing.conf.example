@@ -13,10 +13,11 @@ COMMON_URL=https://github.com/NYUAD-Core-Technology-Platforms/ctp-common.git
 # shared-data changes to reach this page only after a release.
 COMMON_REF=main
 
-# Folder the web server serves. /var/www/html is Apache's default on RHEL, so
-# no web-server configuration is needed if this site is the only one.
-# For nginx's default use /usr/share/nginx/html.
-# Safety: deploy.sh refuses to write into a non-empty folder it did not create.
+# Folder the web server serves. /var/www/html is Apache's default on Ubuntu and
+# RHEL, so no web-server configuration is needed if this site is the only one.
+# (nginx on RHEL uses /usr/share/nginx/html.)
+# Safety: deploy.sh moves a stock "welcome" page aside, and refuses to write into
+# a folder holding anything else that it did not create.
 WEB_ROOT=/var/www/html
 
 # If the server reaches GitHub through a proxy, uncomment and set these.
