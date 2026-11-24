@@ -96,6 +96,26 @@ sudo bash /opt/ctp-internal-landing-page/deploy/install.sh
 
 If `/var/www/html` only holds the web server's default welcome page, it is moved to `/var/www/html.default-page-backup`. If it holds anything else, the deploy stops with a clear message instead of overwriting it: see [Web server](#web-server).
 
+### No sudo on the server
+
+Two ways, both ending with the same auto-updating page:
+
+**1. Ask the server admin to do the one-time system install** (the three commands above). Message you can send:
+
+> Could you run these once on 10.230.240.205? They install our team's internal landing page into /var/www/html and a timer that keeps it updated from GitHub; no further admin work is needed after that.
+> `sudo apt install -y git && sudo git clone https://github.com/NYUAD-Core-Technology-Platforms/ctp-internal-landing-page.git /opt/ctp-internal-landing-page && sudo bash /opt/ctp-internal-landing-page/deploy/install.sh`
+
+**2. Install it under your own account**, served at `http://<server>/~<username>/`. Needs only `git` on the server and Apache's per-user folders (`userdir`) switched on:
+
+```bash
+git clone https://github.com/NYUAD-Core-Technology-Platforms/ctp-internal-landing-page.git ~/ctp-internal-landing-page
+bash ~/ctp-internal-landing-page/deploy/install-user.sh
+```
+
+It publishes into `~/public_html`, adds a line to your crontab that redeploys every 10 minutes (log: `~/.local/state/ctp-landing-deploy.log`), and tells you if your home folder needs `chmod o+x ~` so the web server can reach it. If the URL gives *404 Not Found*, per-user folders are off; an admin can enable them with `sudo a2enmod userdir && sudo systemctl reload apache2`. In this mode, run commands as `bash ~/ctp-internal-landing-page/deploy/deploy.sh` (add `--status` to check) instead of `sudo ctp-landing-deploy`. Settings live in `~/.config/ctp-landing.conf`.
+
+If the repository is private, give the server a read-only deploy key first; see [Private repository](#private-repository) (in user mode, use `~/.ssh` instead of `/root/.ssh` and drop `sudo`).
+
 ### When something changes: what to do
 
 | What changed | What to do |
@@ -168,7 +188,8 @@ site/                         everything that is served
   assets/js/vendor/           js-yaml (MIT), parses YAML in the browser
   assets/img/                 NYUAD logo, favicon, icons.svg (Lucide, ISC)
 deploy/
-  install.sh                  one-time server setup
+  install.sh                  one-time server setup (with sudo)
+  install-user.sh             one-time setup without sudo (~/public_html + crontab)
   deploy.sh                   every deploy (installed as `ctp-landing-deploy`)
   ctp-landing.conf.example    server settings template → /etc/ctp-landing.conf
   systemd/                    10-minute auto-deploy timer
